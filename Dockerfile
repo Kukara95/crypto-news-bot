@@ -1,8 +1,13 @@
 FROM openjdk:21-jdk-slim AS build
 WORKDIR /app
+
 COPY . .
 
-RUN ./gradlew clean build -x test
+RUN --mount=type=cache,target=/root/.gradle \
+	./gradlew dependencies --no-daemon
+
+RUN --mount=type=cache,target=/root/.gradle \
+	./gradlew clean build -x test --no-daemon
 
 FROM openjdk:21-jdk-slim
 
