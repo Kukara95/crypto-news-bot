@@ -12,61 +12,67 @@ import org.springframework.web.util.UriComponentsBuilder
 private const val BASE_URL = "https://newsdata.io/api/1"
 private const val NEWS_PATH = "/latest"
 
-@ConfigurationProperties(prefix = "news.client")
-data class NewsClientProps(
+@ConfigurationProperties(prefix = "news-data.client")
+data class NewsDataClientProps(
     val apiKey: String
 )
 
-data class NewsDto(
+data class NewsDataDto(
     val title: String,
     val creator: String,
     val language: String
 )
 
 @Service
-class NewsClient(
-    private val props: NewsClientProps,
+class NewsDataClient(
+    private val props: NewsDataClientProps,
     @Qualifier("newsWebClient") private val newsWebClient: RestClient
 ) {
-
     private val log = LoggerFactory.getLogger(this.javaClass)
 
-    fun getNews(): List<NewsDto> {
+    fun getNews(): Set<NewsDataDto> {
+        log.info("Getting news from $BASE_URL")
         return newsWebClient
             .get()
-            .uri(createUrl(BASE_URL, "crypto", NEWS_PATH))
+            .uri(createUrl())
             .retrieve()
+            .onStatus(
+                { it.value() == 429 },
+                { _, _ ->
+                    log.warn("Rate limit for news is exceeded")
+                }
+            )
             .body(JsonNode::class.java)!!
             .toNewsDto()
             .filter { it.language == "english" }
+            .toSet()
     }
 
-    private fun createUrl(baseUrl: String, title: String, vararg path: String): String {
+    private fun createUrl(): String {
         return UriComponentsBuilder
-            .fromUriString(baseUrl)
-            .path(path.joinToString(separator = ""))
+            .fromUriString(BASE_URL)
+            .path(NEWS_PATH)
             .queryParam("apikey", props.apiKey)
-            .queryParam("q", title)
+            .queryParam("q", "crypto")
             .toUriString()
     }
 }
 
-fun JsonNode.toNewsDto(): HashSet<NewsDto> {
+fun JsonNode.toNewsDto(): Set<NewsDataDto> {
     if (isError(this)) {
         throw NewsException("news response was not successful")
     }
 
     val results = this["results"] as ArrayNode
-    return HashSet(
-        results
-            .map {
-                NewsDto(
-                    it["title"].asText(),
-                    it["creator"].asText(),
-                    it["language"].asText()
-                )
-            }
-        .toSet())
+    return results
+        .map {
+            NewsDataDto(
+                it["title"].asText(),
+                it["creator"].asText(),
+                it["language"].asText()
+            )
+        }
+        .toSet()
 }
 
 private fun isError(value: JsonNode) = value.has("error")

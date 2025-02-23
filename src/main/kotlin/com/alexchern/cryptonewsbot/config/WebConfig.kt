@@ -12,6 +12,11 @@ class WebConfig {
         return RestClient.builder().build()
     }
 
+    @Bean("newsApiRestClient")
+    fun newsApiRestClient(): RestClient {
+        return RestClient.builder().build()
+    }
+
     @Bean("tgBotWebClient")
     fun tgBotWebClient(): RestClient {
         return RestClient.builder().build()

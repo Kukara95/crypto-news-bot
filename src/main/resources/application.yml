@@ -7,11 +7,18 @@ spring:
       username: admin
       password: admin123
       auto-index-creation: true
-news:
+  ai:
+    openai:
+      api-key: ""
+#      base-url: "https://api.openai.com"
+news-data:
   client:
-    api-key: "pub_71426c8dfeed33ee55555ab4aef2a788916a8"
+    api-key: ""
+news-api:
+    client:
+      api-key: ""
 
 tg:
   bot:
-    client:
-      api-key: "bot7638439516:AAHJ9uJeOagbD2Qmfb7OOUoGZw1zShaTdXQ"
+    api-key: "key"
+    group-id:

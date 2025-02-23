@@ -12,8 +12,6 @@ data class Chat(
     val id: String? = null,
     @Indexed(unique = true)
     val chatId: Long,
-    @Indexed
-    val lastUpdateId: Long
 )
 
 @Repository

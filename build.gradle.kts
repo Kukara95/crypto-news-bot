@@ -6,6 +6,7 @@ plugins {
     id("org.springframework.boot") version "3.4.3"
     id("io.spring.dependency-management") version "1.1.7"
 }
+val springAiVersion by extra("1.0.0-M6")
 
 group = "com.alexchern"
 version = "0.0.1-SNAPSHOT"
@@ -24,9 +25,6 @@ configurations {
 
 repositories {
     mavenCentral()
-    maven {
-        url = uri("https://jitpack.io")
-    }
 }
 
 dependencies {
@@ -41,12 +39,10 @@ dependencies {
     implementation("io.projectreactor.kotlin:reactor-kotlin-extensions")
     implementation("org.jetbrains.kotlin:kotlin-reflect")
 
-    //TG
-    implementation("io.github.kotlin-telegram-bot.kotlin-telegram-bot:telegram:6.3.0")
-
     //Coroutines
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-reactor")
     implementation("org.springframework.boot:spring-boot-starter-data-mongodb-reactive")
+    implementation("org.springframework.ai:spring-ai-openai-spring-boot-starter")
     //Other
     compileOnly("org.projectlombok:lombok")
     developmentOnly("org.springframework.boot:spring-boot-docker-compose")
@@ -62,6 +58,11 @@ dependencies {
 kotlin {
     compilerOptions {
         freeCompilerArgs.addAll("-Xjsr305=strict")
+    }
+}
+dependencyManagement {
+    imports {
+        mavenBom("org.springframework.ai:spring-ai-bom:$springAiVersion")
     }
 }
 
