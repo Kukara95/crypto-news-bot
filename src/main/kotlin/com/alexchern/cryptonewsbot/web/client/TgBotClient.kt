@@ -1,5 +1,8 @@
 package com.alexchern.cryptonewsbot.web.client
 
+import com.alexchern.cryptonewsbot.web.dto.TgSendMessageRequest
+import com.alexchern.cryptonewsbot.web.dto.TgUpdateResponse
+import com.alexchern.cryptonewsbot.web.dto.toTgUpdateDto
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.node.ArrayNode
@@ -15,19 +18,6 @@ private const val BASE_URL = "https://api.telegram.org"
 private const val UPDATES_PATH = "/getUpdates"
 private const val SEND_PATH = "/sendMessage"
 
-data class TgUpdateDto(
-    val chatId: Long,
-    val updateId: Long,
-    val username: String,
-    val message: String,
-)
-
-data class TgSendMessageRequest(
-    @JsonProperty("chat_id")
-    val chatId: Long,
-    val text: String
-)
-
 @ConfigurationProperties(prefix = "tg.bot.client")
 data class TgBotClientProps(
     val apiKey: String
@@ -41,7 +31,7 @@ class TgBotClient(
 
     private val log = LoggerFactory.getLogger(this::class.java)
 
-    fun getUpdates(): List<TgUpdateDto> {
+    fun getUpdates(): List<TgUpdateResponse> {
         log.info("Getting updates from TG API")
         val updatesJson = tgBotWebClient
             .get()
@@ -70,36 +60,3 @@ class TgBotClient(
             .toUriString()
     }
 }
-
-fun JsonNode.toTgUpdateDto(): List<TgUpdateDto> {
-    if (isTgError(this)) {
-        throw TgUpdatesException("tg update response was not successful")
-    }
-
-    val result = this["result"] as ArrayNode
-
-    println("info, result: $result")
-    return result.map { update ->
-        val text = update["message"]
-
-        if (text == null) {
-            println("text is null")
-            TgUpdateDto(
-                chatId = 1123123131,
-                username = "null",
-                message = "null",
-                updateId = 1
-            )
-        } else {
-            val coolText = text["text"]
-            TgUpdateDto(
-                chatId = update["message"]["chat"]["id"].asLong(),
-                username = update["message"]["from"]["username"].asText(),
-                message = coolText.asText()
-            )
-        }
-    }
-}
-
-private fun isTgError(value: JsonNode) = !value["ok"].asBoolean()
-class TgUpdatesException(message: String) : RuntimeException(message)

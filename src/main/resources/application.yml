@@ -13,11 +13,7 @@ news:
 
 tg:
   bot:
-    filter:
-      words:
-        [
-          "",
-          ""
-        ]
     client:
       api-key: "bot7638439516:AAHJ9uJeOagbD2Qmfb7OOUoGZw1zShaTdXQ"
+    listener:
+      delay: 1000
