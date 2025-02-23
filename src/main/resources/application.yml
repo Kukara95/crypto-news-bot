@@ -1,0 +1,23 @@
+spring:
+  application:
+    name: "crypto-news-bot"
+  data:
+    mongodb:
+      uri: mongodb://admin:admin123@mongodb:27017/?authSource=admin
+      username: admin
+      password: admin123
+      auto-index-creation: true
+news:
+  client:
+    api-key: "pub_71426c8dfeed33ee55555ab4aef2a788916a8"
+
+tg:
+  bot:
+    filter:
+      words:
+        [
+          "",
+          ""
+        ]
+    client:
+      api-key: "bot7638439516:AAHJ9uJeOagbD2Qmfb7OOUoGZw1zShaTdXQ"
