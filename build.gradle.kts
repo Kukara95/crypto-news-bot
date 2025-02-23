@@ -1,3 +1,5 @@
+import java.net.URI
+
 plugins {
     kotlin("jvm") version "1.9.25"
     kotlin("plugin.spring") version "1.9.25"
@@ -22,6 +24,9 @@ configurations {
 
 repositories {
     mavenCentral()
+    maven {
+        url = uri("https://jitpack.io")
+    }
 }
 
 dependencies {
@@ -35,6 +40,9 @@ dependencies {
     //Reactor
     implementation("io.projectreactor.kotlin:reactor-kotlin-extensions")
     implementation("org.jetbrains.kotlin:kotlin-reflect")
+
+    //TG
+    implementation("io.github.kotlin-telegram-bot.kotlin-telegram-bot:telegram:6.3.0")
 
     //Coroutines
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-reactor")
